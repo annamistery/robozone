@@ -1,0 +1,11 @@
+# Ставить torch ОТДЕЛЬНО и первым — под свою CUDA.
+# Для RTX 5080 (Blackwell, sm_120) нужен cu128-билд:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+ultralytics>=8.3.0
+transformers>=4.44.0
+opencv-python>=4.9.0
+numpy>=1.26
+pillow>=10.0
+pyyaml>=6.0
+timm>=1.0.0
+accelerate>=0.30.0

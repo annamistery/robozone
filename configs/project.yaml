@@ -1,0 +1,65 @@
+# ============ Пути ============
+paths:
+  videos: "C:/Users/admin/Downloads/Робозон/conveyor_seg/video"
+  frames: "C:/Users/admin/Downloads/Робозон/conveyor_seg/frames_to_annotate"
+  labels_raw: "C:/Users/admin/Downloads/Робозон/work/labels_raw"
+  preview: "C:/Users/admin/Downloads/Робозон/work/preview"
+  dataset: "C:/Users/admin/Downloads/Робозон/work/dataset"
+  runs: "C:/Users/admin/Downloads/Робозон/work/runs"
+
+# ============ Извлечение кадров ============
+frames:
+  every_n: 10            # брать каждый N-й кадр
+  max_per_video: 400     # верхний лимит кадров с одного видео
+  resize_long_side: 1280 # 0 = не ресайзить
+  blur_threshold: 45.0   # variance of Laplacian; ниже — кадр смазан, пропускаем
+  dedup_threshold: 6     # dHash Hamming distance; ниже — почти дубликат, пропускаем
+
+# ============ Grounding DINO (авто-разметка) ============
+gdino:
+  model_id: "IDEA-Research/grounding-dino-base"
+  # Промпты через точку — так требует Grounding DINO.
+  prompt: "object on conveyor. package."
+  box_threshold: 0.22
+  text_threshold: 0.25
+  # Постфильтры мусорных детекций
+  min_box_area_frac: 0.0008   # бокс меньше 0.08% кадра — шум
+  max_box_area_frac: 0.60     # бокс больше 60% кадра — это, скорее всего, сама лента
+  nms_iou: 0.65
+  max_boxes_per_frame: 30
+
+# ============ SAM (бокс -> маска) ============
+sam:
+  weights: "mobile_sam.pt"   # альтернативы: "sam2_b.pt", "sam2.1_b.pt", "sam_b.pt"
+  min_mask_area_frac: 0.0005
+  polygon_epsilon: 0.0015     # approxPolyDP: доля периметра
+  max_polygon_points: 120
+
+# ============ Датасет ============
+dataset:
+  class_names: ["item"]
+  val_fraction: 0.15
+  # Сплит по видео, а не по кадрам
+  split_by_video: true
+  seed: 42
+
+# ============ Обучение ============
+train:
+  model: "yolo11n-seg.pt"    # или yolo11s-seg.pt
+  epochs: 100
+  imgsz: 640
+  batch: 16
+  device: 0
+  workers: 8
+  patience: 30
+  name: "conveyor_seg_v1"
+
+# ============ Рантайм ============
+runtime:
+  weights: ""                # пусто -> берётся best.pt из последнего run
+  conf: 0.15   # было 0.35
+  iou: 0.45    # было 0.55 (смягчим NMS)
+  tracker: "bytetrack.yaml"
+  imgsz: 640
+  # Линия срабатывания для контроллера робота (доля высоты кадра)
+  pick_line_y: 0.55
