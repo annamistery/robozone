@@ -41,7 +41,7 @@ python -m src.build_dataset
 python -m src.train
 
 # 6. Рантайм с трекингом
-python -m src.infer_track --source "C:/Users/admin/Downloads/Робозон/video/test.mp4" --show --save-jsonl picks.jsonl
+python -m src.infer_track --source "C:\Users\admin\Downloads\Робозон\conveyor_seg\video\test.mp4" --show --save-video "C:\Users\admin\Downloads\Робозон\work\out.mp4" --save-jsonl picks.jsonl
 ```
 
 Или всё разом: `run_all.bat`.
